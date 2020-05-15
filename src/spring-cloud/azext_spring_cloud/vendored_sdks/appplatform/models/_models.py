@@ -271,33 +271,43 @@ class BindingResourceProperties(Model):
 class CertificateProperties(Model):
     """Certificate resource payload.
 
+    Variables are only populated by the server, and will be ignored when
+    sending a request.
+
     All required parameters must be populated in order to send to Azure.
 
-    :param thumbprint: The thumbprint of certificate.
-    :type thumbprint: str
+    :ivar thumbprint: The thumbprint of certificate.
+    :vartype thumbprint: str
     :param vault_uri: Required. The vault uri of user key vault.
     :type vault_uri: str
     :param key_vault_cert_name: Required. The certificate name of key vault.
     :type key_vault_cert_name: str
     :param cert_version: The certificate version of key vault.
     :type cert_version: str
-    :param issuer: The issuer of certificate.
-    :type issuer: str
-    :param issued_date: The issue date of certificate.
-    :type issued_date: str
-    :param expiration_date: The expiration date of certificate.
-    :type expiration_date: str
-    :param activate_date: The activate date of certificate.
-    :type activate_date: str
-    :param subject_name: The subject name of certificate.
-    :type subject_name: str
-    :param dns_names: The domain list of certificate.
-    :type dns_names: list[str]
+    :ivar issuer: The issuer of certificate.
+    :vartype issuer: str
+    :ivar issued_date: The issue date of certificate.
+    :vartype issued_date: str
+    :ivar expiration_date: The expiration date of certificate.
+    :vartype expiration_date: str
+    :ivar activate_date: The activate date of certificate.
+    :vartype activate_date: str
+    :ivar subject_name: The subject name of certificate.
+    :vartype subject_name: str
+    :ivar dns_names: The domain list of certificate.
+    :vartype dns_names: list[str]
     """
 
     _validation = {
+        'thumbprint': {'readonly': True},
         'vault_uri': {'required': True},
         'key_vault_cert_name': {'required': True},
+        'issuer': {'readonly': True},
+        'issued_date': {'readonly': True},
+        'expiration_date': {'readonly': True},
+        'activate_date': {'readonly': True},
+        'subject_name': {'readonly': True},
+        'dns_names': {'readonly': True},
     }
 
     _attribute_map = {
@@ -315,16 +325,16 @@ class CertificateProperties(Model):
 
     def __init__(self, **kwargs):
         super(CertificateProperties, self).__init__(**kwargs)
-        self.thumbprint = kwargs.get('thumbprint', None)
+        self.thumbprint = None
         self.vault_uri = kwargs.get('vault_uri', None)
         self.key_vault_cert_name = kwargs.get('key_vault_cert_name', None)
         self.cert_version = kwargs.get('cert_version', None)
-        self.issuer = kwargs.get('issuer', None)
-        self.issued_date = kwargs.get('issued_date', None)
-        self.expiration_date = kwargs.get('expiration_date', None)
-        self.activate_date = kwargs.get('activate_date', None)
-        self.subject_name = kwargs.get('subject_name', None)
-        self.dns_names = kwargs.get('dns_names', None)
+        self.issuer = None
+        self.issued_date = None
+        self.expiration_date = None
+        self.activate_date = None
+        self.subject_name = None
+        self.dns_names = None
 
 
 class CertificateResource(ProxyResource):
@@ -442,6 +452,8 @@ class ClusterResourceProperties(Model):
     :ivar service_id: ServiceInstanceEntity GUID which uniquely identifies a
      created resource
     :vartype service_id: str
+    :param network_profile: Network profile of the Service
+    :type network_profile: ~azure.mgmt.appplatform.models.NetworkProfile
     """
 
     _validation = {
@@ -456,6 +468,7 @@ class ClusterResourceProperties(Model):
         'trace': {'key': 'trace', 'type': 'TraceProperties'},
         'version': {'key': 'version', 'type': 'int'},
         'service_id': {'key': 'serviceId', 'type': 'str'},
+        'network_profile': {'key': 'networkProfile', 'type': 'NetworkProfile'},
     }
 
     def __init__(self, **kwargs):
@@ -465,6 +478,7 @@ class ClusterResourceProperties(Model):
         self.trace = kwargs.get('trace', None)
         self.version = None
         self.service_id = None
+        self.network_profile = kwargs.get('network_profile', None)
 
 
 class ConfigServerGitProperty(Model):
@@ -1134,13 +1148,39 @@ class NameAvailabilityParameters(Model):
         self.name = kwargs.get('name', None)
 
 
+class NetworkProfile(Model):
+    """Service network profile payload.
+
+    :param service_runtime_subnet_id: Fully qualified resource Id of the
+     subnet to host Azure Spring Cloud Service Runtime
+    :type service_runtime_subnet_id: str
+    :param app_subnet_id: Fully qualified resource Id of the subnet to host
+     Azure Spring Cloud Apps
+    :type app_subnet_id: str
+    :param service_cidr: Azure Spring Cloud service reserved CIDR
+    :type service_cidr: str
+    """
+
+    _attribute_map = {
+        'service_runtime_subnet_id': {'key': 'serviceRuntimeSubnetId', 'type': 'str'},
+        'app_subnet_id': {'key': 'appSubnetId', 'type': 'str'},
+        'service_cidr': {'key': 'serviceCidr', 'type': 'str'},
+    }
+
+    def __init__(self, **kwargs):
+        super(NetworkProfile, self).__init__(**kwargs)
+        self.service_runtime_subnet_id = kwargs.get('service_runtime_subnet_id', None)
+        self.app_subnet_id = kwargs.get('app_subnet_id', None)
+        self.service_cidr = kwargs.get('service_cidr', None)
+
+
 class OperationDetail(Model):
     """Operation detail payload.
 
     :param name: Name of the operation
     :type name: str
-    :param data_action: Indicates whether the operation is a data action
-    :type data_action: bool
+    :param is_data_action: Indicates whether the operation is a data action
+    :type is_data_action: bool
     :param display: Display of the operation
     :type display: ~azure.mgmt.appplatform.models.OperationDisplay
     :param origin: Origin of the operation
@@ -1151,7 +1191,7 @@ class OperationDetail(Model):
 
     _attribute_map = {
         'name': {'key': 'name', 'type': 'str'},
-        'data_action': {'key': 'dataAction', 'type': 'bool'},
+        'is_data_action': {'key': 'isDataAction', 'type': 'bool'},
         'display': {'key': 'display', 'type': 'OperationDisplay'},
         'origin': {'key': 'origin', 'type': 'str'},
         'properties': {'key': 'properties', 'type': 'OperationProperties'},
@@ -1160,7 +1200,7 @@ class OperationDetail(Model):
     def __init__(self, **kwargs):
         super(OperationDetail, self).__init__(**kwargs)
         self.name = kwargs.get('name', None)
-        self.data_action = kwargs.get('data_action', None)
+        self.is_data_action = kwargs.get('is_data_action', None)
         self.display = kwargs.get('display', None)
         self.origin = kwargs.get('origin', None)
         self.properties = kwargs.get('properties', None)
