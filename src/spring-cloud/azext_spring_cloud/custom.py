@@ -38,11 +38,21 @@ NO_PRODUCTION_DEPLOYMENT_ERROR = "No production deployment found, use --deployme
 LOG_RUNNING_PROMPT = "This command usually takes minutes to run. Add '--verbose' parameter if needed."
 
 
-def spring_cloud_create(cmd, client, resource_group, name, location=None, no_wait=False):
+def spring_cloud_create(cmd, client, resource_group, name, location=None,
+                        vnet=None, service_runtime_subnet=None, app_subnet=None, reserved_cidr_range=None,
+                        no_wait=False):
     rg_location = _get_rg_location(cmd.cli_ctx, resource_group)
     if location is None:
         location = rg_location
-    resource = models.ServiceResource(location=location)
+    properties = models.ClusterResourceProperties()
+    resource = models.ServiceResource(location=location, properties=properties)
+
+    if service_runtime_subnet or app_subnet or reserved_cidr_range:
+        properties.network_profile = models.NetworkProfile(
+            service_runtime_subnet_id=service_runtime_subnet,
+            app_subnet_id=app_subnet,
+            service_cidr=reserved_cidr_range
+        )
 
     return sdk_no_wait(no_wait, client.create_or_update,
                        resource_group_name=resource_group, service_name=name, resource=resource)
