@@ -17,6 +17,10 @@ helps['spring-cloud create'] = """
     examples:
     - name: Create a new Azure Spring Cloud in westus.
       text: az spring-cloud create -n MyService -g MyResourceGroup -l westus
+    - name: Create a new Azure Spring Cloud with VNet-inected via giving VNet name in current resource group
+      text: az spring-cloud create -n MyService -g MyResourceGroup --vnet MyVNet --app-subnet MyAppSubnet --service-runtime-subnet MyServiceRuntimeSubnet --reserved-cidr-range 10.0.0.0/14
+    - name: Create a new Azure Spring Cloud with VNet-inected via giving subnets resource ID
+      text: az spring-cloud create -n MyService -g MyResourceGroup --app-subnet /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MyVnetRg/providers/Microsoft.Network/VirtualNetworks/test-vnet/subnets/app --service-runtime-subnet /subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/MyVnetRg/providers/Microsoft.Network/VirtualNetworks/test-vnet/subnets/svc --reserved-cidr-range 10.0.0.0/14
 """
 
 helps['spring-cloud delete'] = """
